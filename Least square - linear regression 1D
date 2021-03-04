@@ -1,0 +1,77 @@
+import numpy
+import random
+import matplotlib.pyplot as plt
+
+
+
+
+
+def data_set(x, a, b):
+    numpy.random.seed(999)
+
+    N = len(x)  
+    y_target = numpy.zeros((N,1))
+    y_noise  = numpy.zeros((N,1))
+
+    mu = 0
+    std = 1.5
+
+    y_target = a*x + b
+    y_noise = y_target + numpy.random.normal(mu, std, N)
+
+    plt.plot(x, y_target, linestyle='--',linewidth=2, color='k', label='target line') # **
+    plt.plot(x, y_noise,'ro',markersize=4, markerfacecolor='none', label='data') 
+    plt.show()
+    
+    return y_target, y_noise
+
+def least_square(x, y_target, y_noise):
+    # made by Bang
+    length = len(x)
+    
+    x_np = numpy.zeros((length, 1))    
+    for i in range(length):        
+        x_np[i,0] = x[i]    
+        
+    A = numpy.ones((length,2))
+    A[:,0] = x_np[:,0]
+    
+    step1 = A.transpose() @ A
+    step2 = numpy.linalg.inv(step1)
+    step3 = step2 @ A.transpose()
+    
+    solution = step3 @ y_noise
+    print('Result of least squre method is ',  solution, "\n")
+    
+    y_least_square = solution[0]*x_np+solution[1]    
+    
+    total_error_2 = 0
+        
+    for i in range(length):
+        total_error_2 += (y_target[i] - y_least_square[i]) ** 2     
+        
+    mse = total_error_2 / length
+    
+    
+    plt.plot(x, y_target, linestyle='--',linewidth=2, color='k', label='target line') # **
+    plt.plot(x, y_noise,'ro',markersize=4, markerfacecolor='none', label='data') 
+    plt.plot(x, y_least_square, linestyle = '-', linewidth=1, color = 'b', label = 'least square')
+
+    plt.show()       
+    
+    return y_least_square, mse
+    
+    
+    
+    
+# Data set
+x = numpy.arange(-10, 10, 1)
+a = 1.0
+b = 1.0
+y_target, y_noise = data_set(x, a, b)
+
+
+
+# Least square
+y_least_square, mse = least_square(x, y_target, y_noise)
+print(mse)
