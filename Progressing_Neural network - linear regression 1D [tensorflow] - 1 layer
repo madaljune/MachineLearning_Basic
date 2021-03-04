@@ -1,0 +1,75 @@
+# Reference
+# 1. Optimizer의 종류: https://gomguard.tistory.com/187
+# 2. KERAS.sequential source code: https://github.com/keras-team/keras/blob/master/keras/engine/sequential.py
+
+
+
+
+import numpy 
+import random
+import matplotlib.pyplot as pyplot
+
+
+
+def data_set(x, a, b):
+    numpy.random.seed(999)
+
+    N = len(x)  
+    y_target = numpy.zeros((N,1))
+    y_noise  = numpy.zeros((N,1))
+
+    mu = 0
+    std = 3
+
+    y_target = a*x + b
+    y_noise = y_target + numpy.random.normal(mu, std, N)
+
+    return y_target, y_noise
+    
+
+# Data set
+x = numpy.arange(-10,10,1)
+N = len(x)
+a=1.0
+b=1.0
+y_target, y_noise = data_set(x,a,b)
+
+
+
+import tensorflow.keras as keras
+
+# Neural network with KERAS  (layer = 1)
+# compile
+x_trains = x
+y_trains = y_noise
+
+neural_network_1 = keras.Sequential()
+neural_network_1.add(keras.layers.Dense(units=1, input_dim=1))
+
+opt = keras.optimizers.Adam(lr=0.1) #[1]: https://gomguard.tistory.com/187
+neural_network_1.compile(loss='mse', optimizer=opt, metrics=['mse'])
+
+neural_network_1.summary()
+
+
+# train
+neural_network_1.fit(x_trains, y_trains, epochs = 20, shuffle=False)
+
+
+
+# verification
+x_pred = numpy.random.rand(10,1)*20-10
+y_pred = neural_network_1.predict(x_pred)
+y_answer = a * x_pred + b
+
+
+pyplot.plot(x_trains, y_trains, 'ro', markersize = 4, markerfacecolor = 'none')
+pyplot.plot(x, y_target, '--', linewidth = 1, color='black')
+pyplot.plot(x_pred, y_pred, 'bo', markersize = 4, markerfacecolor = 'none')
+pyplot.show()
+
+
+
+
+
+
