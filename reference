@@ -1,0 +1,14 @@
+** about deep learning **
+[1] KERAS
+    - Description
+        . model compile : https://www.machinelearningmindset.com/linear-regression-with-tensorflow/
+        . optimizer? : https://gomguard.tistory.com/187
+    - Source code
+        . sequentia? : https://github.com/keras-team/keras/blob/master/keras/engine/sequential.py
+
+[2] Numpy
+    - Source code
+        . modeling: https://github.com/SkalskiP/ILearnDeepLearning.py/blob/master/01_mysteries_of_neural_networks/03_numpy_neural_net/Numpy%20deep%20neural%20network.ipynb
+                    https://github.com/jldbc/numpy_neural_net/blob/master/three_layer_network.py
+                    https://github.com/jldbc/numpy_neural_net/blob/master/four_layer_network.py
+                    https://roadcom.tistory.com/87
