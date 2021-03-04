@@ -1,0 +1,128 @@
+import numpy
+import random
+import matplotlib.pyplot as pyplot
+
+
+
+class neural_network:
+    def __init__(self, input_nodes_number, output_nodes_number, learning_rate):
+        numpy.random.seed(999) # 항상 동일한 결과를 나타내도록 seed 지정
+        
+        # 노드 수 설정
+        self.input_nodes_number = input_nodes_number        
+        self.output_nodes_number  =  output_nodes_number
+        
+        # 학습률 설정
+        self.learning_rate  = learning_rate
+
+        # 가중치 초기값 생성
+        mean_weight_ini = 1   # 초기값을 만들 때 random 모듈의 정균분포(normal distribution)를 이용할 것입니다.
+        std_weight_ini  = 0.5 # 무작위 수를 뽑아내도 크게 상관없지만, 해와 너무 동떨어지게 되면 정확성이 떨어질 수 있기 때문입니다.
+
+        self.weight_input_output  = numpy.random.normal(mean_weight_ini, std_weight_ini, (self.output_nodes_number, self.input_nodes_number))
+        self.bias_input_output  = numpy.random.normal(mean_weight_ini, std_weight_ini, (1, self.output_nodes_number))
+        # 각 가중치 행렬의 개수는 아래에서 설명드리겠습니다.
+        
+    
+    def train(self, x_train, y_train, epoch):
+        N=len(x_train)  
+
+        total_error_squared = 0
+        
+        # 데이터 셋별로 에러값 계산 및 가중치에 반영
+        for i_nn in range(N):              
+            inputs = x_train[i_nn]
+            targets = y_train[i_nn]     
+
+            final_inputs = numpy.dot(self.weight_input_output, inputs) + self.bias_input_output
+            final_outputs = activation_function(final_inputs)
+
+            output_errors = final_outputs - targets
+            total_error_squared += output_errors**2     
+
+            # 가중치 업데이트 --> (question. 밖으로 빼내어야 할까?)
+            self.weight_input_output += -2/N * self.learning_rate * output_errors * inputs
+            self.bias_input_output += -2/N * self.learning_rate * output_errors
+
+        print('Epoch #', epoch,', MSE = ', total_error_squared/N )
+#         print('\t a_nn=', self.weight_input_output)
+#         print('\t b_nn=', self.bias_input_output)
+
+    def query(self, x): 
+        N = len(x)
+        outputs = numpy.zeros(N)
+
+        for i_nn in range(N):  
+            inputs = x[i_nn]
+
+            final_inputs = numpy.dot(self.weight_input_output, inputs) + self.bias_input_output
+            final_outputs = activation_function(final_inputs)
+
+            outputs[i_nn] = final_outputs 
+
+        return outputs
+
+def activation_function(x):
+    return linear(x)
+
+def linear(x):
+    return x
+
+def data_set(x, a, b):
+    numpy.random.seed(999)
+
+    N = len(x)  
+    y_target = numpy.zeros((N,1))
+    y_noise  = numpy.zeros((N,1))
+
+    mu = 0
+    std = 1.5
+
+    y_target = a*x + b
+    y_noise = y_target + numpy.random.normal(mu, std, N)
+
+    return y_target, y_noise
+    
+    
+    
+# Data set
+x = numpy.arange(-10,10,1)
+N = len(x)
+a=1
+b=1
+y_target, y_noise = data_set(x,a,b)
+
+
+
+
+
+# Neural network: compile
+x_train = x
+y_train = y_noise
+
+input_nodes_number = 1
+output_nodes_number = 1
+learning_rate = 0.1
+
+neural_network_model = neural_network(input_nodes_number, output_nodes_number, learning_rate)
+
+
+# Neural network: train
+N_epoch = 10
+for epoch in range(N_epoch):
+    neural_network_model.train(x_train, y_train, epoch)
+    
+    
+    
+# Neural network: vrification
+x_pred = numpy.random.rand(10,1)*20-10
+y_answer = a * x_pred + b
+y_pred = numpy.transpose(neural_network_model.query(x_pred))
+
+pyplot.plot(x, y_noise, 'ro', markersize = 4, markerfacecolor = 'none')
+pyplot.plot(x, y_target, '--', linewidth = 1, color='black')
+pyplot.plot(x_pred, y_pred, 'bo', markersize = 4, markerfacecolor = 'none')
+pyplot.show()
+    
+
+
